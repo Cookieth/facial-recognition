@@ -11,7 +11,7 @@ Makefile
 cmake_install.cmake
 
 # Build files
-facial-recognition
+image-processing
 
 # OpenCV files
 opencv_contrib/
