@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/Users/keithchoa/facial-recognition/build",
-  "command": "/usr/bin/clang++   -isystem /Users/keithchoa/facial-recognition/install/include/opencv4  -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk   -std=gnu++14 -o CMakeFiles/image-processing.dir/main.cpp.o -c /Users/keithchoa/facial-recognition/main.cpp",
-  "file": "/Users/keithchoa/facial-recognition/main.cpp"
-}
-]
