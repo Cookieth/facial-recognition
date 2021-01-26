@@ -1,0 +1,15 @@
+# Mac Files
+.DS_Store
+
+# CMake Files
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+
+# Build files
+facial-recognition
+
+# OpenCV fiels
+opencv_contrib/
+install/
