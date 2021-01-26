@@ -9,6 +9,7 @@ CMakeFiles/
 CMakeCache.txt
 Makefile
 cmake_install.cmake
+build/
 
 # Build files
 image-processing
