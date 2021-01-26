@@ -1,5 +1,5 @@
-# facial-recognition
-Brief demo for facial recognition using C++
+# OpenCV Image Processing Demonstration
+Brief demonstration of image processing capabilities in OpenCV using C++
 
 ## Overview
 
