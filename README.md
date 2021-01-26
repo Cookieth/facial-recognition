@@ -3,7 +3,25 @@ Brief demo for facial recognition using C++
 
 ## Overview
 
-Project description here
+I have created 3 demos so far, piecing together information from opencv's thorough documentation: https://docs.opencv.org/
+
+### `faceDetection()`
+![Face](docs/Face.png)
+
+This uses a Haar Cascade Frontal Face Classifier to detect faces in the image, and draw a bounding box around them.
+
+### `cannyEdgeDetection()`
+![Canny1](docs/Canny1.png)
+![Canny1](docs/Canny2.png)
+
+This takes the maximum intensity point in the image, and takes a fraction of that to take the threshold value (this makes sure that it works in all lighting). Once the threshold is created, a binary image is created, and is passed through the Canny Edge Detection algorithm. After that, all contours are found in the image, randomly assigned a color, and output to a matrix of the same size.
+
+### `colorThreshold()`
+![kmeans](docs/kmeans.png)
+
+This uses the kmeans algorithm to cluster similar colors. The 3 channel colors are compressed into a 3-wide matrix, the kmeans algorithm is applied, and pixels are replaced with their center values.
+
+Read more: https://docs.opencv.org/master/d1/d5c/tutorial_py_kmeans_opencv.html
 
 ## Installing OpenCV using CMake on MacOS
 
@@ -73,5 +91,5 @@ target_link_libraries(facial-recognition ${OpenCV_LIBS} )
 
 ### References
 
-Official: https://docs.opencv.org/master/d0/db2/tutorial_macos_install.html
+Official: https://docs.opencv.org/master/d0/db2/tutorial_macos_install.html  
 Full: https://thecodinginterface.com/blog/opencv-cpp-vscode/

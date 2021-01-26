@@ -1,11 +1,9 @@
 # CMakeLists.txt
 
-# Older versions of CMake are likely to work just fine but, since
-# I don't know where to cut off I just use the version I'm using
+# Change this version to your current version
 cmake_minimum_required(VERSION "3.15")
 
-# name of this example project
-project(facial-recognition)
+project(image-processing)
 
 # set OpenCV_DIR variable equal to the path to the cmake
 # files within the previously installed opencv program
@@ -24,7 +22,7 @@ find_package( OpenCV REQUIRED )
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 
 # specify the executable target to be built
-add_executable(facial-recognition main.cpp)
+add_executable(image-processing main.cpp)
 
 # tell it to link the executable target against OpenCV
-target_link_libraries(facial-recognition ${OpenCV_LIBS} )
+target_link_libraries(image-processing ${OpenCV_LIBS} )

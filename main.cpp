@@ -1,3 +1,4 @@
+#include <opencv2/imgcodecs.hpp>
 #include <opencv2/objdetect.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
@@ -8,6 +9,8 @@
 #include <iostream>
 #include <stdio.h>
 
+#define THRESHOLD_FACTOR 0.25
+
 // Video Capture Documentation: https://docs.opencv.org/3.4/d8/dfe/classcv_1_1VideoCapture.html
 // XML Haar Cascade for Facial Recognition: https://github.com/opencv/opencv/tree/master/data/haarcascades
 
@@ -16,6 +19,7 @@ cv::CascadeClassifier face_cascade;
 
 void faceDetection(cv::Mat frame);
 void cannyEdgeDetection(cv::Mat frame);
+void colorThreshold(cv::Mat frame);
 
 int main(int, char **)
 {
@@ -45,9 +49,7 @@ int main(int, char **)
 
     face_cascade.load("./harcascade_frontalface_default.xml");
 
-    //--- GRAB AND WRITE LOOP
-    std::cout << "Start grabbing" << std::endl
-              << "Press any key to terminate" << std::endl;
+    std::cout << "Press any key to terminate" << std::endl;
 
     for (;;)
     {
@@ -60,8 +62,10 @@ int main(int, char **)
             break;
         }
 
+        // === Various Implementations ===
         //faceDetection(frame);
-        cannyEdgeDetection(frame);
+        //cannyEdgeDetection(frame);
+        colorThreshold(frame);
 
         if (cv::waitKey(5) >= 0)
             break;
@@ -96,6 +100,9 @@ void cannyEdgeDetection(cv::Mat frame)
     cv::Mat frame_gray;
     double min_intensity;
     double max_intensity;
+    std::vector<std::vector<cv::Point> > outlines;
+
+    cv::RNG rng(12345);
 
     cv::cvtColor(frame, frame_gray, cv::COLOR_BGR2GRAY);
 
@@ -107,9 +114,55 @@ void cannyEdgeDetection(cv::Mat frame)
     cv::minMaxLoc(frame_gray, &min_intensity, &max_intensity);
 
     // Do I need a threshold here?
-    cv::threshold(frame_gray, frame_gray, (max_intensity) * (0.25), 255, cv::THRESH_BINARY);
+    cv::threshold(frame_gray, frame_gray, (max_intensity) * (THRESHOLD_FACTOR), 255, cv::THRESH_BINARY);
 
     cv::Canny(frame_gray, frame_gray, max_intensity, max_intensity * 3);
 
-    cv::imshow("Capture - Canny Edge Detection", frame_gray);
+    // Close any holes
+    int kernel_size = 4;
+    cv::Mat kernel = getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(2 * kernel_size + 1, 2 * kernel_size + 1), cv::Point(kernel_size, kernel_size));
+    cv::morphologyEx(frame_gray, frame_gray, cv::MORPH_CLOSE, kernel);
+
+    // Find contours in the image
+    cv::findContours(frame_gray, outlines, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
+
+    cv::Mat contour_frame = cv::Mat::zeros(frame_gray.size(), CV_8UC3);
+
+    // Randomize output of contours
+    for (size_t i = 0; i < outlines.size(); i++)
+    {
+        cv::Scalar color = cv::Scalar(rng.uniform(0, 256), rng.uniform(0, 256), rng.uniform(0, 256));
+        cv::drawContours(contour_frame, outlines, (int)i, color, 2, cv::LINE_8);
+    }
+
+    // Output the canny edge detection window
+    //cv::imshow("Capture - Canny Edge Detection", frame_gray);
+
+    // Output contours drawn
+    cv::imshow("Capture - Canny Edge Detection w/ Contours", contour_frame);
+}
+
+void colorThreshold(cv::Mat frame){
+    // Reshape to 3 column image (one for each color)
+    cv::Mat kmeans_frame;
+    frame.convertTo(kmeans_frame, CV_32F);
+    kmeans_frame = kmeans_frame.reshape(1, kmeans_frame.total());
+
+    cv::Mat labels, centers;
+    //TermCriteria: https://docs.opencv.org/3.4/d9/d5d/classcv_1_1TermCriteria.html
+    cv::kmeans(kmeans_frame, 8, labels, cv::TermCriteria(cv::TermCriteria::Type::MAX_ITER + 2, 10, 1.0), 3, cv::KMEANS_PP_CENTERS, centers);
+
+    centers = centers.reshape(3,centers.rows);
+    kmeans_frame = kmeans_frame.reshape(3,kmeans_frame.rows);
+
+    cv::Vec3f *p = kmeans_frame.ptr<cv::Vec3f>();
+    for (size_t i = 0; i < kmeans_frame.rows; i++) {
+        int center_id = labels.at<int>(i);
+        p[i] = centers.at<cv::Vec3f>(center_id);
+    }
+
+    frame = kmeans_frame.reshape(3, frame.rows);
+    frame.convertTo(frame, CV_8U);
+
+    cv::imshow("Capture - kMeans Color Quantization", frame);
 }
