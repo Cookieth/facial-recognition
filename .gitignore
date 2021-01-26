@@ -1,3 +1,6 @@
+# VS Code Files
+.vscode/
+
 # Mac Files
 .DS_Store
 
@@ -10,6 +13,9 @@ cmake_install.cmake
 # Build files
 facial-recognition
 
-# OpenCV fiels
+# OpenCV files
 opencv_contrib/
 install/
+
+# Facial Recognition Training Set
+harcascade_frontalface_default.xml
